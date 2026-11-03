@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My Library</title>
+<meta name="description" content="An interactive library of the books I've read and the ones I'm reading next.">
+<!-- LinkedIn link preview: update og:url and og:image after deploying -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="My Virtual Library">
+<meta property="og:description" content="Books I've read, what I'm reading, and what's next.">
+<meta property="og:image" content="/og.png">
+<style>
+:root{--bg:#f6f1e9;--panel:#fffdf8;--ink:#2a2118;--muted:#7a6c5c;--line:#e3d9c8;--accent:#8a4b2a;--shelf:#b98b5e;--shelf-d:#8f6a43}
+@media (prefers-color-scheme:dark){:root{--bg:#1b1612;--panel:#262019;--ink:#f1e8da;--muted:#a89a87;--line:#3a3128;--accent:#e0a074;--shelf:#6b4b30;--shelf-d:#4a3322}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Georgia,'Iowan Old Style',serif}
+.wrap{max-width:1080px;margin:0 auto;padding:40px 16px 64px}
+h1{font-size:clamp(28px,5vw,44px);margin:0 0 4px;letter-spacing:-.5px}
+.tag{color:var(--muted);margin:0 0 24px}
+.stats{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 16px;font-family:system-ui,sans-serif}
+.stat b{display:block;font-size:22px;color:var(--accent)}
+.stat span{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:28px;font-family:system-ui,sans-serif}
+.tabs{display:flex;gap:6px;flex-wrap:wrap}
+button,select,input{font:inherit;font-family:system-ui,sans-serif}
+.tab{border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:7px 14px;border-radius:999px;cursor:pointer;font-size:14px}
+.tab[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:var(--bg)}
+input,select{border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:7px 12px;border-radius:8px;font-size:14px}
+input{flex:1;min-width:160px}
+.shelf{margin-bottom:36px}
+.shelf h2{font-size:14px;font-family:system-ui,sans-serif;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin:0 0 12px}
+.row{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:20px 16px;padding:18px 16px 0;border-bottom:14px solid var(--shelf);box-shadow:0 6px 0 var(--shelf-d);border-radius:4px 4px 2px 2px;background:linear-gradient(var(--panel),var(--bg))}
+.book{all:unset;display:block;cursor:pointer;text-align:center;padding-bottom:0;transition:transform .15s}
+.book:hover,.book:focus-visible{transform:translateY(-6px)}
+.book:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
+.cover{aspect-ratio:2/3;border-radius:3px 6px 6px 3px;box-shadow:-3px 4px 8px rgba(0,0,0,.3);overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;padding:10px;color:#fff;font-weight:bold;font-size:14px;line-height:1.2}
+.cover img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.cover::after{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:linear-gradient(90deg,rgba(0,0,0,.35),transparent)}
+.badge{position:absolute;top:6px;right:6px;z-index:1;font:600 10px system-ui;padding:2px 6px;border-radius:99px;background:#000a;color:#fff}
+.bt{font-size:13px;margin:8px 0 14px;color:var(--ink)}
+.empty{color:var(--muted);padding:40px 0;text-align:center}
+dialog{border:1px solid var(--line);border-radius:14px;background:var(--panel);color:var(--ink);max-width:560px;width:calc(100% - 32px);padding:0}
+dialog::backdrop{background:#0008}
+.d{display:grid;grid-template-columns:140px 1fr;gap:20px;padding:24px}
+@media(max-width:480px){.d{grid-template-columns:1fr}.d .cover{max-width:140px}}
+.d h3{margin:0 0 2px;font-size:22px}
+.d .by{color:var(--muted);margin:0 0 10px}
+.stars{color:var(--accent);letter-spacing:2px;font-size:18px}
+.chips span{display:inline-block;font:12px system-ui;border:1px solid var(--line);border-radius:99px;padding:2px 10px;margin:0 4px 4px 0;color:var(--muted)}
+.close{position:absolute;top:8px;right:12px;background:none;border:0;color:var(--muted);font-size:26px;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1 id="title">My Library</h1>
+  <p class="tag" id="tagline"></p>
+  <div class="stats" id="stats"></div>
+  <div class="controls">
+    <div class="tabs" id="tabs"></div>
+    <input id="q" type="search" placeholder="Search title, author, tag…" aria-label="Search">
+    <select id="sort" aria-label="Sort">
+      <option value="default">Shelf order</option>
+      <option value="title">Title A–Z</option>
+      <option value="rating">Top rated</option>
+      <option value="recent">Recently finished</option>
+    </select>
+  </div>
+  <div id="shelves"></div>
+</div>
+
+<dialog id="dlg"><button class="close" aria-label="Close" onclick="dlg.close()">×</button><div class="d" id="detail"></div></dialog>
+
+<script>
+const LABELS={all:'All',read:'Read',reading:'Reading','to-read':'To read'};
+const SHELF_TITLES={reading:'Currently reading','to-read':'Up next',read:'Read'};
+let books=[],filter='all';
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const hue=s=>{let h=0;for(const c of s)h=(h*31+c.charCodeAt(0))%360;return h};
+
+function cover(b){
+  const bg=`hsl(${hue(b.title)} 35% 32%)`;
+  const img=b.isbn?`<img loading="lazy" alt="" src="https://covers.openlibrary.org/b/isbn/${esc(b.isbn)}-L.jpg?default=false" onerror="this.remove()">`:'';
+  return `<div class="cover" style="background:${bg}"><span>${esc(b.title)}</span>${img}</div>`;
+}
+function stars(n){return n?'★'.repeat(n)+'☆'.repeat(5-n):''}
+
+function render(){
+  const q=$('q').value.trim().toLowerCase(), sort=$('sort').value;
+  let list=books.filter(b=>(filter==='all'||b.status===filter)&&
+    (!q||[b.title,b.author,...(b.tags||[])].join(' ').toLowerCase().includes(q)));
+  const cmp={title:(a,b)=>a.title.localeCompare(b.title),rating:(a,b)=>(b.rating||0)-(a.rating||0),
+    recent:(a,b)=>(b.finished||'').localeCompare(a.finished||''),default:()=>0}[sort];
+  list=[...list].sort(cmp);
+  const out=['reading','to-read','read'].map(s=>{
+    const items=list.filter(b=>b.status===s); if(!items.length) return '';
+    return `<section class="shelf"><h2>${SHELF_TITLES[s]} · ${items.length}</h2><div class="row">${
+      items.map(b=>`<button class="book" data-i="${books.indexOf(b)}" aria-label="${esc(b.title)} by ${esc(b.author)}">${cover(b)}<div class="bt">${esc(b.title)}</div></button>`).join('')
+    }</div></section>`}).join('');
+  $('shelves').innerHTML=out||'<p class="empty">No books match.</p>';
+}
+function open(i){
+  const b=books[i];
+  $('detail').innerHTML=`${cover(b)}<div><h3>${esc(b.title)}</h3><p class="by">${esc(b.author)}</p>
+    <div class="stars" aria-label="${b.rating||0} of 5 stars">${stars(b.rating)}</div>
+    <p style="margin:6px 0;font:13px system-ui;color:var(--muted)">${LABELS[b.status]}${b.finished?' · finished '+esc(b.finished):''}</p>
+    <div class="chips">${(b.tags||[]).map(t=>`<span>${esc(t)}</span>`).join('')}</div>
+    ${b.note?`<p>${esc(b.note)}</p>`:''}</div>`;
+  dlg.showModal();
+}
+fetch('books.json').then(r=>r.json()).then(d=>{
+  books=d.books; document.title=(d.owner||'My')+"'s Library";
+  $('title').textContent=(d.owner?d.owner+"'s ":'My ')+'Library'; $('tagline').textContent=d.tagline||'';
+  const n=s=>books.filter(b=>b.status===s).length;
+  $('stats').innerHTML=[['Read',n('read')],['Reading',n('reading')],['To read',n('to-read')]]
+    .map(([l,v])=>`<div class="stat"><b>${v}</b><span>${l}</span></div>`).join('');
+  $('tabs').innerHTML=Object.entries(LABELS).map(([k,l])=>`<button class="tab" data-f="${k}" aria-pressed="${k===filter}">${l}</button>`).join('');
+  render();
+}).catch(()=>{$('shelves').innerHTML='<p class="empty">Could not load books.json.</p>'});
+
+$('tabs').addEventListener('click',e=>{const t=e.target.closest('.tab');if(!t)return;filter=t.dataset.f;
+  document.querySelectorAll('.tab').forEach(x=>x.setAttribute('aria-pressed',x===t));render()});
+$('shelves').addEventListener('click',e=>{const b=e.target.closest('.book');if(b)open(+b.dataset.i)});
+$('q').addEventListener('input',render);$('sort').addEventListener('change',render);
+dlg.addEventListener('click',e=>{if(e.target===dlg)dlg.close()});
+</script>
+</body>
+</html>

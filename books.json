@@ -1,0 +1,12 @@
+{
+  "owner": "Your Name",
+  "tagline": "What I've read, what I'm reading, and what's next.",
+  "books": [
+    { "title": "Atomic Habits", "author": "James Clear", "isbn": "9780735211292", "status": "read", "rating": 5, "finished": "2026-03", "tags": ["Self-improvement"], "note": "Replace this with your own takeaway." },
+    { "title": "Thinking, Fast and Slow", "author": "Daniel Kahneman", "isbn": "9780374533557", "status": "read", "rating": 4, "finished": "2026-06", "tags": ["Psychology"], "note": "" },
+    { "title": "The Lean Startup", "author": "Eric Ries", "isbn": "9780307887894", "status": "read", "rating": 4, "finished": "2025-11", "tags": ["Business"], "note": "" },
+    { "title": "Storytelling with Data", "author": "Cole Nussbaumer Knaflic", "isbn": "9781119002253", "status": "reading", "rating": 0, "finished": "", "tags": ["Data"], "note": "Currently working through this one." },
+    { "title": "Deep Work", "author": "Cal Newport", "isbn": "9781455586691", "status": "to-read", "rating": 0, "finished": "", "tags": ["Productivity"], "note": "" },
+    { "title": "The Black Swan", "author": "Nassim Nicholas Taleb", "isbn": "9780812973815", "status": "to-read", "rating": 0, "finished": "", "tags": ["Business", "Psychology"], "note": "" }
+  ]
+}
