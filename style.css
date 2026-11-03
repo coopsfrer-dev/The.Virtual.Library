@@ -1,0 +1,76 @@
+/* Shared by the whole site: edit colors here and everything changes. */
+:root{
+  --bg:#f6f4ee;      /* page background (soft off-white) */
+  --text:#22211d;    /* main text */
+  --dim:#7a766b;     /* secondary text */
+  --line:#e2dfd4;    /* thin borders */
+  --card:#fbfaf6;    /* home page boxes */
+}
+*{box-sizing:border-box}
+html{scroll-behavior:auto}
+body{
+  margin:0;background:var(--bg);color:var(--text);
+  font:15px/1.7 ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+}
+h1,h2,p,div{margin:0}
+
+/* ---------- layout ---------- */
+/* Each place fills the screen. Moving between them slides panels; the page itself never scrolls. */
+html,body{height:100%;overflow:hidden}
+.panel{
+  position:fixed;inset:0;overflow-y:auto;padding:9vh 20px 60px;
+  transition:transform .85s cubic-bezier(.65,0,.25,1),visibility 0s .85s;visibility:hidden;
+}
+.panel.center{display:flex;align-items:center;padding-top:40px}
+#home{transform:translateY(-100%)}
+#read,#unread{transform:translateY(100%)}
+body[data-view=home] #home,body[data-view=read] #read,body[data-view=unread] #unread{
+  transform:translateY(0);visibility:visible;transition:transform .85s cubic-bezier(.65,0,.25,1),visibility 0s;
+}
+.back{
+  display:block;background:none;border:0;padding:0;margin-bottom:18px;font:inherit;color:var(--dim);
+  cursor:pointer;min-height:1.7em;
+}
+.back:hover{color:var(--text)}
+.wrap{max-width:900px;margin:0 auto;width:100%}
+.wrap.wide{max-width:1400px}
+.line{min-height:1.7em;margin-bottom:8px;white-space:pre-wrap;word-break:break-word}
+.title{font-size:28px;font-weight:700;margin-bottom:6px}
+.dim{color:var(--dim)}
+
+/* home page */
+.hero{display:flex;gap:28px;align-items:center;margin-bottom:28px;flex-wrap:wrap}
+.photo{width:140px;height:140px;border-radius:50%;object-fit:cover;background:var(--line)}
+.hero .text{flex:1;min-width:240px}
+.shelves{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-top:32px}
+.shelf-card{
+  display:block;text-decoration:none;color:var(--text);background:var(--card);
+  border:1px solid var(--line);border-radius:12px;padding:24px;transition:border-color .15s,transform .15s;
+}
+.shelf-card:hover,.shelf-card:focus-visible{border-color:var(--text);transform:translateY(-3px);outline:none}
+.shelf-card .label{font-size:20px;font-weight:700}
+.shelf-card .count{color:var(--dim);margin-top:4px}
+
+/* shelves: three covers across, details type out on hover */
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:40px clamp(12px,3vw,48px);margin-top:28px;max-width:calc(3*(62vh*2/3) + 100px)}
+.book{color:var(--text);outline:none}
+.details{margin-top:14px;min-height:7.5em}
+.cover{
+  aspect-ratio:2/3;border-radius:4px 8px 8px 4px;overflow:hidden;position:relative;
+  box-shadow:3px 3px 4px rgba(0,0,0,.18),11px 13px 18px rgba(0,0,0,.26);display:flex;align-items:center;justify-content:center;
+  padding:12px;color:#fff;font-weight:700;font-size:14px;line-height:1.3;text-align:center;
+  transition:transform .15s;
+}
+.cover img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.cover::after{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:linear-gradient(90deg,rgba(0,0,0,.3),transparent)}
+.book .t{font-weight:700;font-size:16px;line-height:1.4}
+.book .a{color:var(--dim);font-size:14px}
+.book .s{font-size:14px;margin-top:2px}
+.book .n{color:var(--dim);font-size:13px;margin-top:6px}
+.book:hover .cover,.book:focus-visible .cover{transform:translateY(-4px)}
+
+.pending{visibility:hidden}
+.typing::after{content:"|";margin-left:1px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.hint{position:fixed;top:10px;right:14px;font-size:12px;color:var(--dim);z-index:5}
+@media (max-width:600px){.hint{display:none}.title{font-size:24px}}
